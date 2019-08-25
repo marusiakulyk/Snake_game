@@ -1,5 +1,5 @@
 body {
-    background: black;
+    background: #282e2a;
 }
 
 .game__score, .game__description {
@@ -20,20 +20,17 @@ body {
 
 .cell {
     display: inline-block;
-    border-style: solid;
-    border-width: 1px;
-    border-color: black;
-    width: 18px;
-    height: 18px;
-}
-
-.snake-cell {
-    display: inline-block;
-    background: #03fc52;
+    border: none;
     width: 20px;
     height: 20px;
 }
 
+.snake_cell {
+    background: #03fc52;
+}
+.food_cell{
+    background: white;
+}
 .row {
     height: 20px;
 }

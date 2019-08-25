@@ -1,5 +1,6 @@
 FIELD_SIZE = 20;
-SNAKE_SPEED = 100;
+SNAKE_SPEED = 500;
+
 
 const changeDirection = (event) => {
     if (event.keyCode ==  38) {
@@ -24,34 +25,7 @@ const changeDirection = (event) => {
     }
 };
 
-
-function touchCatched(event) {
-    touch = event;
-}
-
-function touchEnded(event) {
-    var offsetX = touch.changedTouches[0].clientX - event.changedTouches[0].clientX;
-    var offsetY = touch.changedTouches[0].clientY - event.changedTouches[0].clientY;
-
-    var rule = {};
-
-    if (Math.abs(offsetX) > Math.abs(offsetY)) {
-        if (offsetX < 0) {
-            rule.keyCode = 39;
-        } else {
-            rule.keyCode = 37;
-        }
-    } else {
-        if (offsetY < 0) {
-            rule.keyCode = 40;
-        } else {
-            rule.keyCode = 38;
-        }
-    }
-    changeDirection(rule);
-}
-
-function spawnSnake() {
+const spawnSnake = () => {
     for (var i = FIELD_SIZE - 3; i < FIELD_SIZE; i++) {
         field.children[FIELD_SIZE - 1].children[i].className = "snake-cell";
     }
@@ -62,40 +36,35 @@ function spawnSnake() {
 
     snake.direction = "left";
     return snake;
-}
+};
 
 const Cell = () => {
-    var cell = document.createElement("div");
+    let cell = document.createElement("div");
     cell.className = "cell";
     return cell;
 };
 
 const Row = (length) => {
-
-    var row = document.createElement("div");
+    let row = document.createElement("div");
     row.className = "row";
-
-    for (var i = 0; i < length; i++) {
-        row.appendChild(Cell());
-    }
+    new Array(length).fill(length).map(() => Cell())
+        .forEach((child) => row.appendChild(child));
     return row;
 };
 
-function Field(size) {
+const Field = (size) => {
 
-    var field = document.createElement("div");
+    let field = document.createElement("div");
     field.className = "game__field";
     field.spawnSnake = spawnSnake;
-
-    for (var i = 0; i < size; i++) {
-        field.appendChild(Row(size));
-    }
+    new Array(size).fill(size).map(i => Row(size))
+        .forEach((child) => field.appendChild(child));
 
     for (var i = 0; i < FIELD_SIZE; i++) {
         for (var j = 0; j < FIELD_SIZE; j++) {
             cell = field.children[i].children[j];
             if (i == 0) {
-                cell.up = field.children[FIELD_SIZE-1].children[j];
+                cell.up = null;
             } else {
                 cell.up = field.children[i-1].children[j];
             }
@@ -117,24 +86,22 @@ function Field(size) {
         }
     }
     return field;
-}
+};
 
-function startScreen() {
+const startScreen = () => {
     document.getElementById("game").style.display = "none";
-
-    var preloadScreen = document.getElementsByClassName("start-screen")[0];
-    var startButton = document.getElementsByClassName("start-screen__button")[0];
+    let startButton = document.getElementsByClassName("start-screen__button")[0];
     startButton.addEventListener("click", startGame);
-}
+};
 
-function startGame() {
+const startGame = () => {
     document.getElementsByClassName("game")[0].style.display = "block";
 
     document.getElementById("start-screen").style.display = "none";
 
     field = Field(FIELD_SIZE);
 
-    var div = document.getElementById("game__field");
+    let div = document.getElementById("game__field");
     div.appendChild(field);
 
 
@@ -144,26 +111,22 @@ function startGame() {
     points.textContent = 0;
 
     spawnFood();
-    intervalID = window.setInterval(snakeMotion, SNAKE_SPEED);
+    intervalID = setInterval(snakeMotion, SNAKE_SPEED);
 
-}
+};
 
-/* up: 38; down:40; left: 37; right: 39*/
-
-
-function spawnFood() {
-    var food;
-    do {
-        food = field.children[Math.floor(Math.random() * FIELD_SIZE)].children[Math.floor(Math.random() * FIELD_SIZE)];
-    } while (food.className == "snake-cell");
+const spawnFood = () => {
+    let food = field.children[Math.floor(Math.random() * FIELD_SIZE)].children[Math.floor(Math.random() * FIELD_SIZE)];
+    food.className === "cell snake_cell" ? spawnFood() : () => {}
     food.eat = true;
-    food.style.background = "white";
-}
+    food.className = "cell food_cell";
+};
 
-function snakeMotion() {
+
+const snakeMotion = () => {
     var nextCell = snake[snake.direction];
-    SNAKE_SPEED = Math.floor(points/10)*100;
-    if (nextCell && (nextCell.className != "snake-cell")) {
+
+    if (nextCell && (nextCell.className != "cell snake_cell")) {
         nextCell.direction = snake.direction;
         nextCell.tail = snake;
         if (nextCell.eat) {
@@ -180,23 +143,24 @@ function snakeMotion() {
             delete previousCell.tail;
         } else {
             currentCell.eat = false;
+
         }
         currentCell.className = "cell";
-        currentCell.style.background = "";
+        currentCell.style.background = " ";
+
+        snake = nextCell;
+        snake.className = "cell snake_cell";
     } else {
-        window.setInterval = null;
+        setInterval = null;
         var newGame = confirm("You lose with " + points.textContent + " points!\nCreate a new game?");
         if (newGame) {
-            document.getElementById("game").removeChild(field);
+            document.getElementById("game__field").removeChild(field);
             startGame();
         }
         clearInterval(intervalID);
     }
-    snake = nextCell;
-    snake.className = "snake-cell";
-}
 
-window.onload = startScreen();
-window.addEventListener("keydown", changeDirection, false);
-window.addEventListener("touchstart", touchCatched, false);
-window.addEventListener("touchmove", touchEnded, false);
+};
+
+startScreen();
+addEventListener("keydown", changeDirection, false);
