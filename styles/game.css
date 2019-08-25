@@ -2,7 +2,7 @@ body {
     background: #282e2a;
 }
 
-.game__score, .game__description {
+.game__score {
     color: white;
     text-align: center;
     font-size: 1.5em;

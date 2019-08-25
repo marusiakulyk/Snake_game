@@ -1,42 +1,6 @@
 FIELD_SIZE = 20;
-SNAKE_SPEED = 500;
+SNAKE_SPEED = 100;
 
-
-const changeDirection = (event) => {
-    if (event.keyCode ==  38) {
-        if (snake.direction == "left" || snake.direction == "right") {
-            snake.direction = "up";
-        }
-    }
-    if (event.keyCode ==  40) {
-        if (snake.direction == "left" || snake.direction == "right") {
-            snake.direction = "down";
-        }
-    }
-    if (event.keyCode ==  37) {
-        if (snake.direction == "up" || snake.direction == "down") {
-            snake.direction = "left";
-        }
-    }
-    if (event.keyCode ==  39) {
-        if (snake.direction == "up" || snake.direction == "down") {
-            snake.direction = "right";
-        }
-    }
-};
-
-const spawnSnake = () => {
-    for (var i = FIELD_SIZE - 3; i < FIELD_SIZE; i++) {
-        field.children[FIELD_SIZE - 1].children[i].className = "snake-cell";
-    }
-
-    snake = field.children[FIELD_SIZE - 1].children[FIELD_SIZE - 3];
-    snake.tail = field.children[FIELD_SIZE - 1].children[FIELD_SIZE - 2];
-    snake.tail.tail = field.children[FIELD_SIZE - 1].children[FIELD_SIZE - 1];
-
-    snake.direction = "left";
-    return snake;
-};
 
 const Cell = () => {
     let cell = document.createElement("div");
@@ -60,8 +24,8 @@ const Field = (size) => {
     new Array(size).fill(size).map(i => Row(size))
         .forEach((child) => field.appendChild(child));
 
-    for (var i = 0; i < FIELD_SIZE; i++) {
-        for (var j = 0; j < FIELD_SIZE; j++) {
+    for (let i = 0; i < FIELD_SIZE; i++) {
+        for (let j = 0; j < FIELD_SIZE; j++) {
             cell = field.children[i].children[j];
             if (i == 0) {
                 cell.up = null;
@@ -88,6 +52,49 @@ const Field = (size) => {
     return field;
 };
 
+const spawnFood = () => {
+    let food = field.children[Math.floor(Math.random() * FIELD_SIZE)].children[Math.floor(Math.random() * FIELD_SIZE)];
+    food.className === "cell snake_cell" ? spawnFood() : () => {}
+    food.eat = true;
+    food.className = "cell food_cell";
+};
+const spawnSnake = () => {
+    for (let i = FIELD_SIZE - 3; i < FIELD_SIZE; i++) {
+        field.children[FIELD_SIZE - 1].children[i].className = "snake-cell";
+    }
+
+    snake = field.children[FIELD_SIZE - 1].children[FIELD_SIZE - 3];
+    snake.tail = field.children[FIELD_SIZE - 1].children[FIELD_SIZE - 2];
+    snake.tail.tail = field.children[FIELD_SIZE - 1].children[FIELD_SIZE - 1];
+
+    snake.direction = "left";
+    return snake;
+};
+
+const changeDirection = (event) => {
+    if (event.code ==  "ArrowUp") {
+        if (snake.direction == "left" || snake.direction == "right") {
+            snake.direction = "up";
+        }
+    }
+    if (event.code ==  "ArrowDown") {
+        if (snake.direction == "left" || snake.direction == "right") {
+            snake.direction = "down";
+        }
+    }
+    if (event.code ==  "ArrowLeft") {
+        if (snake.direction == "up" || snake.direction == "down") {
+            snake.direction = "left";
+        }
+    }
+    if (event.code ==  "ArrowRight") {
+        if (snake.direction == "up" || snake.direction == "down") {
+            snake.direction = "right";
+        }
+    }
+};
+
+
 const startScreen = () => {
     document.getElementById("game").style.display = "none";
     let startButton = document.getElementsByClassName("start-screen__button")[0];
@@ -95,7 +102,7 @@ const startScreen = () => {
 };
 
 const startGame = () => {
-    document.getElementsByClassName("game")[0].style.display = "block";
+    document.getElementById("game").style.display = "block";
 
     document.getElementById("start-screen").style.display = "none";
 
@@ -107,34 +114,27 @@ const startGame = () => {
 
     snake = field.spawnSnake();
 
-    points = document.getElementById("score");
-    points.textContent = 0;
+    score = document.getElementById("score");
+    score.textContent = 0;
 
     spawnFood();
-    intervalID = setInterval(snakeMotion, SNAKE_SPEED);
+    intervalID = setInterval(Game, SNAKE_SPEED);
 
 };
 
-const spawnFood = () => {
-    let food = field.children[Math.floor(Math.random() * FIELD_SIZE)].children[Math.floor(Math.random() * FIELD_SIZE)];
-    food.className === "cell snake_cell" ? spawnFood() : () => {}
-    food.eat = true;
-    food.className = "cell food_cell";
-};
 
-
-const snakeMotion = () => {
-    var nextCell = snake[snake.direction];
+const Game = () => {
+    let nextCell = snake[snake.direction];
 
     if (nextCell && (nextCell.className != "cell snake_cell")) {
         nextCell.direction = snake.direction;
         nextCell.tail = snake;
         if (nextCell.eat) {
             spawnFood();
-            points.textContent++;
+            score.textContent++;
         }
-        var currentCell = snake.tail;
-        var previousCell;
+        let currentCell = snake.tail;
+        let previousCell;
         while (currentCell.tail) {
             previousCell = currentCell;
             currentCell = currentCell.tail;
@@ -146,13 +146,12 @@ const snakeMotion = () => {
 
         }
         currentCell.className = "cell";
-        currentCell.style.background = " ";
 
         snake = nextCell;
         snake.className = "cell snake_cell";
     } else {
         setInterval = null;
-        var newGame = confirm("You lose with " + points.textContent + " points!\nCreate a new game?");
+        let newGame = confirm("You lose with " + score.textContent + " score!\nCreate a new game?");
         if (newGame) {
             document.getElementById("game__field").removeChild(field);
             startGame();
