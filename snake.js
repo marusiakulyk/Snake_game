@@ -11,7 +11,7 @@ const Cell = () => {
 const Row = (length) => {
     let row = document.createElement("div");
     row.className = "row";
-    new Array(length).fill(length).map(() => Cell())
+    new Array(length).fill(0).map(() => Cell())
         .forEach((child) => row.appendChild(child));
     return row;
 };
@@ -21,7 +21,7 @@ const Field = (size) => {
     let field = document.createElement("div");
     field.className = "game__field";
     field.spawnSnake = spawnSnake;
-    new Array(size).fill(size).map(i => Row(size))
+    new Array(size).fill(0).map(() => Row(size))
         .forEach((child) => field.appendChild(child));
 
     for (let i = 0; i < FIELD_SIZE; i++) {
@@ -54,20 +54,17 @@ const Field = (size) => {
 
 const spawnFood = () => {
     let food = field.children[Math.floor(Math.random() * FIELD_SIZE)].children[Math.floor(Math.random() * FIELD_SIZE)];
-    food.className === "cell snake_cell" ? spawnFood() : () => {}
+    food.className === "cell snake_cell" ? spawnFood() : () => {};
     food.eat = true;
     food.className = "cell food_cell";
 };
+
 const spawnSnake = () => {
-    for (let i = FIELD_SIZE - 3; i < FIELD_SIZE; i++) {
-        field.children[FIELD_SIZE - 1].children[i].className = "snake-cell";
-    }
-
-    snake = field.children[FIELD_SIZE - 1].children[FIELD_SIZE - 3];
-    snake.tail = field.children[FIELD_SIZE - 1].children[FIELD_SIZE - 2];
-    snake.tail.tail = field.children[FIELD_SIZE - 1].children[FIELD_SIZE - 1];
-
-    snake.direction = "left";
+    [...Array(3).keys()].forEach(i => field.children[0].children[i].className = "cell snake_cell");
+    snake = field.children[0].children[2];
+    snake.tail = field.children[0].children[1];
+    snake.tail.tail = field.children[0].children[0];
+    snake.direction = "down";
     return snake;
 };
 
@@ -97,30 +94,12 @@ const changeDirection = (event) => {
 
 const startScreen = () => {
     document.getElementById("game").style.display = "none";
-    let startButton = document.getElementsByClassName("start-screen__button")[0];
+    let startButton = document.getElementById("start-screen__button");
+    console.log(startButton);
     startButton.addEventListener("click", startGame);
+    changeSpeed = 0;
 };
 
-const startGame = () => {
-    document.getElementById("game").style.display = "block";
-
-    document.getElementById("start-screen").style.display = "none";
-
-    field = Field(FIELD_SIZE);
-
-    let div = document.getElementById("game__field");
-    div.appendChild(field);
-
-
-    snake = field.spawnSnake();
-
-    score = document.getElementById("score");
-    score.textContent = 0;
-
-    spawnFood();
-    intervalID = setInterval(Game, SNAKE_SPEED);
-
-};
 
 
 const Game = () => {
@@ -149,15 +128,49 @@ const Game = () => {
 
         snake = nextCell;
         snake.className = "cell snake_cell";
+        if((score.textContent-1)%10 === 0){
+            changeSpeed = 1;
+        }
+        console.log(SNAKE_SPEED);
+        console.log(changeSpeed);
+        if(score.textContent%10 === 0 && changeSpeed){
+            SNAKE_SPEED = SNAKE_SPEED-50;
+            setTimeout(Game, SNAKE_SPEED);
+            changeSpeed = 0;
+            console.log(SNAKE_SPEED);
+        }
+
+        else{setTimeout(Game, SNAKE_SPEED)}
     } else {
-        setInterval = null;
+        setTimeout = null;
         let newGame = confirm("You lose with " + score.textContent + " score!\nCreate a new game?");
         if (newGame) {
             document.getElementById("game__field").removeChild(field);
             startGame();
         }
-        clearInterval(intervalID);
+        clearTimeout(intervalID);
     }
+
+};
+
+
+const startGame = () => {
+    document.getElementById("game").style.display = "block";
+    document.getElementById("start-screen").style.display = "none";
+
+    field = Field(FIELD_SIZE);
+
+    let div = document.getElementById("game__field");
+    div.appendChild(field);
+
+
+    snake = field.spawnSnake();
+
+    score = document.getElementById("score");
+    score.textContent = 0;
+
+    spawnFood();
+    intervalID = setTimeout(Game, SNAKE_SPEED);
 
 };
 
