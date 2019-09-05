@@ -33,6 +33,24 @@
     color: white;
 }
 
+.start-screen__level{
+    display: flex;
+    flex-direction: row;
+    margin: 20px;
+}
+
+
+.start-screen__level__select{
+    display: inline;
+    color: white;
+    font-size: 1.5em;
+    margin: 0;
+}
+
+.start-screen__level__title{
+    color: white;
+    font-size: 1.5em;
+}
 th {
     text-align: left;
 }

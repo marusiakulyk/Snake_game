@@ -1,5 +1,6 @@
 const FIELD_SIZE = 20;
 let SNAKE_SPEED = 200;
+const SPEED_INCREASE = 40;
 let changeSpeedFlag = 0;
 
 const displayScores = () => {
@@ -16,23 +17,32 @@ const displayScores = () => {
 
 };
 
+const chooseLevel = () => {
+    [...Array(5).keys()].forEach(i => {
+        if (document.getElementById(i).checked === true) {
+            SNAKE_SPEED = SNAKE_SPEED - SPEED_INCREASE * i;
+            console.log(SNAKE_SPEED)
+        }
+    })
+};
+
 const sortLocalStorage = () => Object.keys(localStorage)
-        .map((k) =>[k, localStorage.getItem(k)])
+    .map((k) => [k, localStorage.getItem(k)])
     .sort((i, j) => j[1] - i[1])
 ;
 
-const renderFinalScreen = () =>{
+const renderFinalScreen = () => {
     document.getElementById("game").style.display = "none";
     const form = document.getElementById("form");
     form.innerHTML = "<div class='end-game'><span class='end-game__instructions'>Please, enter your name</span> " +
         "<form id='form' class = 'end-game__form'>" +
         "<input class='end-game__text-field' id='text-field' type='text'>" +
-        "<input type='submit' class='submit-button' title='Enter'></form></div>";
+        "<input type='submit' class='submit-button' value='Enter'></form></div>";
 };
 
 const saveResult = (score) => {
     const name = document.getElementById("text-field").value;
-    localStorage.setItem(name,score);
+    localStorage.setItem(name, score);
 };
 
 const Cell = () => {
@@ -63,22 +73,22 @@ const Field = (size) => {
             if (i === 0) {
                 cell.up = null;
             } else {
-                cell.up = field.children[i-1].children[j];
+                cell.up = field.children[i - 1].children[j];
             }
             if (j === 0) {
                 cell.left = null;
             } else {
-                cell.left = field.children[i].children[j-1];
+                cell.left = field.children[i].children[j - 1];
             }
             if (j === FIELD_SIZE - 1) {
                 cell.right = null;
             } else {
-                cell.right = field.children[i].children[j+1];
+                cell.right = field.children[i].children[j + 1];
             }
             if (i === FIELD_SIZE - 1) {
                 cell.down = null;
             } else {
-                cell.down = field.children[i+1].children[j];
+                cell.down = field.children[i + 1].children[j];
             }
         }
     }
@@ -86,8 +96,11 @@ const Field = (size) => {
 };
 
 const spawnFood = (field) => {
+    console.log(field);
+    console.log(field.children);
     let food = field.children[Math.floor(Math.random() * FIELD_SIZE)].children[Math.floor(Math.random() * FIELD_SIZE)];
-    food.className === "cell snake_cell" ? spawnFood() : () => {};
+    food.className === "cell snake_cell" ? spawnFood() : () => {
+    };
     food.eat = true;
     food.className = "cell food_cell";
 };
@@ -102,30 +115,33 @@ const spawnSnake = (field) => {
 };
 
 const changeDirection = (event) => {
-    if (event.code ===  "ArrowUp") {
+    console.log('hi');
+    if (event.code === "ArrowUp") {
         if (snake.direction === "left" || snake.direction === "right") {
             snake.direction = "up";
         }
     }
-    if (event.code ===  "ArrowDown") {
+    if (event.code === "ArrowDown") {
         if (snake.direction === "left" || snake.direction === "right") {
             snake.direction = "down";
         }
     }
-    if (event.code ===  "ArrowLeft") {
+    if (event.code === "ArrowLeft") {
         if (snake.direction === "up" || snake.direction === "down") {
             snake.direction = "left";
         }
     }
-    if (event.code ===  "ArrowRight") {
+    if (event.code === "ArrowRight") {
         if (snake.direction === "up" || snake.direction === "down") {
             snake.direction = "right";
         }
     }
+    console.log('hello');
 };
 
 
 const startScreen = () => {
+    [...Array(20).keys()].forEach(i => console.log(Math.floor(Math.random() * FIELD_SIZE)));
     displayScores();
     document.getElementById("game").style.display = "none";
     let startButton = document.getElementById("start-screen__button");
@@ -133,8 +149,7 @@ const startScreen = () => {
 };
 
 
-
-const Game = (field,  score) => {
+const Game = (field, score) => {
     let nextCell = snake[snake.direction];
 
     if (nextCell && (nextCell.className !== "cell snake_cell")) {
@@ -160,22 +175,21 @@ const Game = (field,  score) => {
 
         snake = nextCell;
         snake.className = "cell snake_cell";
-        if((score.textContent-1)%10 === 0){
+        if ((score.textContent - 1) % 10 === 0) {
             changeSpeedFlag = 1;
         }
 
-        if(score.textContent%10 === 0 && changeSpeedFlag){
-            SNAKE_SPEED = SNAKE_SPEED-20;
-            setTimeout(Game, SNAKE_SPEED, field,  score);
+        if (score.textContent % 10 === 0 && changeSpeedFlag && SNAKE_SPEED !== SPEED_INCREASE) {
+            SNAKE_SPEED = SNAKE_SPEED - SPEED_INCREASE;
+            setTimeout(Game, SNAKE_SPEED, field, score);
             changeSpeedFlag = 0;
+        } else {
+            setTimeout(Game, SNAKE_SPEED, field, score)
         }
-
-        else{setTimeout(Game, SNAKE_SPEED, field,  score)}
-    }
-    else {
+    } else {
         renderFinalScreen();
         let form = document.getElementById("form");
-        form.addEventListener("submit", ()=>{
+        form.addEventListener("submit", () => {
             saveResult(score.textContent);
             console.log(score.textContent);
             console.log(localStorage);
@@ -187,6 +201,8 @@ const Game = (field,  score) => {
 
 
 const startGame = () => {
+    chooseLevel();
+
     document.getElementById("game").style.display = "block";
     document.getElementById("start-screen").style.display = "none";
     let field = Field(FIELD_SIZE);
@@ -201,7 +217,7 @@ const startGame = () => {
     score.textContent = 0;
 
     spawnFood(field);
-    intervalID = setTimeout(Game, SNAKE_SPEED, field,  score);
+    setTimeout(Game, SNAKE_SPEED, field, score);
 
 };
 

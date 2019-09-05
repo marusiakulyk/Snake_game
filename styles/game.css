@@ -1,3 +1,14 @@
+:root{
+    --field_size:400px;
+}
+
+
+@media(max-width: 400px) {
+    :root{
+        --field_size: 300px;
+    }
+}
+
 body {
     background: #282e2a;
 }
@@ -11,33 +22,30 @@ body {
 
 .game__field {
     margin: 0 auto;
-    display: grid;
-    grid-auto-flow: column;
-    grid-template-rows: repeat(20, 20px 5%);
-    grid-template-columns: auto;
     border-style: solid;
     border-width: 4px;
     border-color: white;
-    max-height: 400px;
-    max-width: 400px;
+    max-height: var(--field_size);
+    max-width: var(--field_size);
 
 
 }
 
 .cell {
+    display: inline-block;
     border: none;
-
+    height:calc(var(--field_size)/20);
+    width: calc(var(--field_size)/20);
 }
 
 .snake_cell {
     background: #03fc52;
+
 }
 .food_cell{
     background: white;
 }
 .row {
-    display: grid;
-    grid-template-rows: auto;
-    grid-template-columns: repeat(20, 20px 5%);
+    height: calc(var(--field_size)/20);
 }
 
