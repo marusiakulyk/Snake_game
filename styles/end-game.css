@@ -1,0 +1,15 @@
+.end-game__form{
+    display: flex;
+}
+.end-game{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.end-game__instructions{
+    color: white;
+    text-align: center;
+    font-size: 1.5em;
+    line-height: 1.8em;
+}

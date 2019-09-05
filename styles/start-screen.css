@@ -1,25 +1,38 @@
-.start-screen{
+.start-screen {
     display: flex;
     flex-direction: column;
     justify-content: center;
 
     align-items: center;
 }
-.start-screen__button{
+
+.start-screen__button {
     cursor: pointer;
     font-size: 2em;
     font-weight: bold;
     padding: 0.6em 1.6em;
     text-align: center;
-
+    margin-bottom: 20px;
     border-radius: 100px;
     background-color: transparent;
     border: 2px solid #03fc52;
     color: #03fc52;
 }
-.start-screen__title{
+
+.start-screen__title {
     color: white;
     text-align: center;
     font-size: 5em;
-    line-height: 3em;
+    line-height: 1.5em;
+}
+
+.start-screen__leaderboard {
+    list-style: none;
+    font-size: 2em;
+    font-weight: bold;
+    color: white;
+}
+
+th {
+    text-align: left;
 }
