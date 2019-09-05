@@ -21,7 +21,6 @@ const chooseLevel = () => {
     [...Array(5).keys()].forEach(i => {
         if (document.getElementById(i).checked === true) {
             SNAKE_SPEED = SNAKE_SPEED - SPEED_INCREASE * i;
-            console.log(SNAKE_SPEED)
         }
     })
 };
@@ -96,8 +95,6 @@ const Field = (size) => {
 };
 
 const spawnFood = (field) => {
-    console.log(field);
-    console.log(field.children);
     let food = field.children[Math.floor(Math.random() * FIELD_SIZE)].children[Math.floor(Math.random() * FIELD_SIZE)];
     food.className === "cell snake_cell" ? spawnFood() : () => {
     };
@@ -115,7 +112,6 @@ const spawnSnake = (field) => {
 };
 
 const changeDirection = (event) => {
-    console.log('hi');
     if (event.code === "ArrowUp") {
         if (snake.direction === "left" || snake.direction === "right") {
             snake.direction = "up";
@@ -136,12 +132,10 @@ const changeDirection = (event) => {
             snake.direction = "right";
         }
     }
-    console.log('hello');
 };
 
 
 const startScreen = () => {
-    [...Array(20).keys()].forEach(i => console.log(Math.floor(Math.random() * FIELD_SIZE)));
     displayScores();
     document.getElementById("game").style.display = "none";
     let startButton = document.getElementById("start-screen__button");
@@ -191,8 +185,6 @@ const Game = (field, score) => {
         let form = document.getElementById("form");
         form.addEventListener("submit", () => {
             saveResult(score.textContent);
-            console.log(score.textContent);
-            console.log(localStorage);
         });
 
     }
