@@ -1,23 +1,12 @@
-const FIELD_SIZE = 20;
+import {displayScores} from "./leaderboard";
+
 let SNAKE_SPEED = 200;
 const SPEED_INCREASE = 40;
 let changeSpeedFlag = 0;
+const FIELD_SIZE = 20;
 
-const displayScores = () => {
-    let scores = sortLocalStorage();
-    let scoresTable = document.createElement("table");
-    scoresTable.className = "start-screen__leaderboard";
-    scoresTable.innerHTML = "<tr><th>Name</th><th>Score</th>";
-    document.getElementById('start-screen').appendChild(scoresTable);
-    [...Array(Math.min(scores.length, 5)).keys()].forEach(i => {
-        let tr = document.createElement('tr');
-        tr.innerHTML = `<td>${scores[i][0]}</td> <td>${scores[i][1]}</td>`;
-        scoresTable.appendChild(tr);
-    });
 
-};
-
-const chooseLevel = () => {
+export const chooseLevel = () => {
     [...Array(5).keys()].forEach(i => {
         if (document.getElementById(i).checked === true) {
             SNAKE_SPEED = SNAKE_SPEED - SPEED_INCREASE * i;
@@ -25,10 +14,6 @@ const chooseLevel = () => {
     })
 };
 
-const sortLocalStorage = () => Object.keys(localStorage)
-    .map((k) => [k, localStorage.getItem(k)])
-    .sort((i, j) => j[1] - i[1])
-;
 
 const renderFinalScreen = () => {
     document.getElementById("game").style.display = "none";
@@ -58,7 +43,7 @@ const Row = (length) => {
     return row;
 };
 
-const Field = (size) => {
+export const Field = (size) => {
 
     let field = document.createElement("div");
     field.className = "game__field";
@@ -68,7 +53,7 @@ const Field = (size) => {
 
     for (let i = 0; i < FIELD_SIZE; i++) {
         for (let j = 0; j < FIELD_SIZE; j++) {
-            cell = field.children[i].children[j];
+            let cell = field.children[i].children[j];
             if (i === 0) {
                 cell.up = null;
             } else {
@@ -102,7 +87,7 @@ const spawnFood = (field) => {
     food.className = "cell food_cell";
 };
 
-const spawnSnake = (field) => {
+export const spawnSnake = (field) => {
     [...Array(3).keys()].forEach(i => field.children[0].children[i].className = "cell snake_cell");
     let snake = field.children[0].children[2];
     snake.tail = field.children[0].children[1];
@@ -111,49 +96,56 @@ const spawnSnake = (field) => {
     return snake;
 };
 
-const changeDirection = (event) => {
+export const changeDirection = (event, snake) => {
+    console.log(event);
+    console.log(snake);
+    // snake = snake[0];
     if (event.code === "ArrowUp") {
-        if (snake.direction === "left" || snake.direction === "right") {
-            snake.direction = "up";
+        if (snake[0].direction === "left" || snake[0].direction === "right") {
+            snake[0].direction = "up";
         }
     }
     if (event.code === "ArrowDown") {
-        if (snake.direction === "left" || snake.direction === "right") {
-            snake.direction = "down";
+        if (snake[0].direction === "left" || snake[0].direction === "right") {
+            snake[0].direction = "down";
         }
     }
     if (event.code === "ArrowLeft") {
-        if (snake.direction === "up" || snake.direction === "down") {
-            snake.direction = "left";
+        if (snake[0].direction === "up" || snake[0].direction === "down") {
+            snake[0].direction = "left";
         }
     }
     if (event.code === "ArrowRight") {
-        if (snake.direction === "up" || snake.direction === "down") {
-            snake.direction = "right";
+        if (snake[0].direction === "up" || snake[0].direction === "down") {
+            snake[0].direction = "right";
         }
     }
+    console.log(snake[0].direction);
 };
 
 
-const startScreen = () => {
+export const startScreen = (field, snake) => {
     displayScores();
     document.getElementById("game").style.display = "none";
     let startButton = document.getElementById("start-screen__button");
-    startButton.addEventListener("click", startGame);
+    startButton.addEventListener("click", () => startGame(field, snake));
 };
 
 
-const Game = (field, score) => {
-    let nextCell = snake[snake.direction];
+const Game = (field, score, snake) => {
+    console.log("f=game: ", snake[0].direction);
+    console.log("f=game: ", snake);
+    let nextCell = snake[0][snake[0].direction];
+    console.log("next", nextCell);
 
     if (nextCell && (nextCell.className !== "cell snake_cell")) {
-        nextCell.direction = snake.direction;
-        nextCell.tail = snake;
+        nextCell.direction = snake[0].direction;
+        nextCell.tail = snake[0];
         if (nextCell.eat) {
             spawnFood(field);
             score.textContent++;
         }
-        let currentCell = snake.tail;
+        let currentCell = snake[0].tail;
         let previousCell;
         while (currentCell.tail) {
             previousCell = currentCell;
@@ -167,18 +159,18 @@ const Game = (field, score) => {
         }
         currentCell.className = "cell";
 
-        snake = nextCell;
-        snake.className = "cell snake_cell";
+        snake[0] = nextCell;
+        snake[0].className = "cell snake_cell";
         if ((score.textContent - 1) % 10 === 0) {
             changeSpeedFlag = 1;
         }
 
         if (score.textContent % 10 === 0 && changeSpeedFlag && SNAKE_SPEED !== SPEED_INCREASE) {
             SNAKE_SPEED = SNAKE_SPEED - SPEED_INCREASE;
-            setTimeout(Game, SNAKE_SPEED, field, score);
+            setTimeout(Game, SNAKE_SPEED, field, score, snake);
             changeSpeedFlag = 0;
         } else {
-            setTimeout(Game, SNAKE_SPEED, field, score)
+            setTimeout(Game, SNAKE_SPEED, field, score, snake)
         }
     } else {
         renderFinalScreen();
@@ -192,27 +184,21 @@ const Game = (field, score) => {
 };
 
 
-const startGame = () => {
+const startGame = (field,  snake) => {
     chooseLevel();
 
     document.getElementById("game").style.display = "block";
     document.getElementById("start-screen").style.display = "none";
-    let field = Field(FIELD_SIZE);
 
     let div = document.getElementById("game__field");
     div.appendChild(field);
-
-
-    snake = field.spawnSnake(field);
 
     let score = document.getElementById("score");
     score.textContent = 0;
 
     spawnFood(field);
-    setTimeout(Game, SNAKE_SPEED, field, score);
+    setTimeout(Game, SNAKE_SPEED, field, score, snake);
 
 };
 
-startScreen();
-addEventListener("keydown", changeDirection, false);
 

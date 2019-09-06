@@ -9,6 +9,12 @@
     }
 }
 
+@media(max-width: 300px) {
+    :root{
+        --field_size: 200px;
+    }
+}
+
 body {
     background: #282e2a;
 }
