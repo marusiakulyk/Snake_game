@@ -51,8 +51,8 @@ export const Field = (size) => {
     new Array(size).fill(0).map(() => Row(size))
         .forEach((child) => field.appendChild(child));
 
-    for (let i = 0; i < FIELD_SIZE; i++) {
-        for (let j = 0; j < FIELD_SIZE; j++) {
+    [...Array(FIELD_SIZE).keys()].forEach(i => {
+        [...Array(FIELD_SIZE).keys()].forEach( j => {
             let cell = field.children[i].children[j];
             if (i === 0) {
                 cell.up = null;
@@ -74,8 +74,8 @@ export const Field = (size) => {
             } else {
                 cell.down = field.children[i + 1].children[j];
             }
-        }
-    }
+        });
+    });
     return field;
 };
 
@@ -97,9 +97,6 @@ export const spawnSnake = (field) => {
 };
 
 export const changeDirection = (event, snake) => {
-    console.log(event);
-    console.log(snake);
-    // snake = snake[0];
     if (event.code === "ArrowUp") {
         if (snake[0].direction === "left" || snake[0].direction === "right") {
             snake[0].direction = "up";
@@ -120,7 +117,6 @@ export const changeDirection = (event, snake) => {
             snake[0].direction = "right";
         }
     }
-    console.log(snake[0].direction);
 };
 
 
@@ -133,10 +129,7 @@ export const startScreen = (field, snake) => {
 
 
 const Game = (field, score, snake) => {
-    console.log("f=game: ", snake[0].direction);
-    console.log("f=game: ", snake);
     let nextCell = snake[0][snake[0].direction];
-    console.log("next", nextCell);
 
     if (nextCell && (nextCell.className !== "cell snake_cell")) {
         nextCell.direction = snake[0].direction;
@@ -161,15 +154,18 @@ const Game = (field, score, snake) => {
 
         snake[0] = nextCell;
         snake[0].className = "cell snake_cell";
-        if ((score.textContent - 1) % 10 === 0) {
-            changeSpeedFlag = 1;
-        }
 
         if (score.textContent % 10 === 0 && changeSpeedFlag && SNAKE_SPEED !== SPEED_INCREASE) {
             SNAKE_SPEED = SNAKE_SPEED - SPEED_INCREASE;
             setTimeout(Game, SNAKE_SPEED, field, score, snake);
             changeSpeedFlag = 0;
-        } else {
+        }
+        else if ((score.textContent - 1) % 10 === 0) {
+            changeSpeedFlag = 1;
+            setTimeout(Game, SNAKE_SPEED, field, score, snake)
+        }
+
+        else {
             setTimeout(Game, SNAKE_SPEED, field, score, snake)
         }
     } else {
