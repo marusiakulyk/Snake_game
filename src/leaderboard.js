@@ -2,7 +2,7 @@ export const displayScores = () => {
     let scores = sortLocalStorage();
     let scoresTable = document.createElement("table");
     scoresTable.className = "start-screen__leaderboard";
-    scoresTable.innerHTML = "<tr><th>Name</th><th>Score</th>";
+    scoresTable.innerHTML = "<tr><th class='start-screen__leaderboard__title'>Name</th><th class='start-screen__leaderboard__title'>Score</th>";
     document.getElementById('start-screen').appendChild(scoresTable);
     [...Array(Math.min(scores.length, 5)).keys()].forEach(i => {
         let tr = document.createElement('tr');
